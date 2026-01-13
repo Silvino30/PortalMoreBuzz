@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>MORE BUZZ - Portal do Divulgador</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        buzzBlue: '#001529',
+                        buzzBlueLight: '#002140',
+                        buzzYellow: '#ffc107',
+                        buzzYellowHover: '#e0a800',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+
+    <!-- JQuery & MaskPlugin -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+    <style>
+        :root { --vh: 1vh; }
+        
+        /* Fix de altura para Safari iOS */
+        html, body {
+            height: 100%;
+            height: -webkit-fill-available;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f9fafb;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Fallback */
+            height: calc(var(--vh, 1vh) * 100);
+        }
+        
+        /* Prevenção de zoom automático no Safari iOS */
+        input, select, textarea { font-size: 16px !important; }
+
+        .safe-area-top { padding-top: env(safe-area-inset-top); }
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cor de Login que você gostou (Lighter Blue Gradient) */
+        .login-bg { background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%); }
+
+        /* Estilos Sistema - Fidelidade ao Original */
+        .page-section { display: none !important; animation: fadeIn 0.3s ease-in-out; }
+        .page-section.active { display: block !important; }
+
+        .nav-item.active {
+            background-color: #001529; 
+            border-right: 4px solid #ffc107; 
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .accordion-content { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+        .accordion-content.open { max-height: 2000px; opacity: 1; }
+        .rotate-180 { transform: rotate(180deg); }
+
+        /* Kanban - Estrutura Original */
+        .kanban-container { display: grid; grid-template-columns: 1fr; gap: 1rem; padding-bottom: 1rem; height: 100%; overflow-y: auto; }
+        .kanban-column { width: 100%; display: flex; flex-direction: column; height: 400px; }
+        @media (min-width: 768px) { .kanban-container { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .kanban-container { grid-template-columns: repeat(4, 1fr); overflow-y: hidden; } .kanban-column { height: 100%; max-width: none; } }
+
+        .custom-scroll { -webkit-overflow-scrolling: touch; }
+    </style>
+
+<!-- MoreBuzz Chat Widget styles -->
+<style>
+:root{
+  --mbchat-primary:#001529;   /* buzzBlue */
+  --mbchat-accent:#ffc107;    /* buzzYellow */
+  --mbchat-bg:#ffffff;
+  --mbchat-surface:#ffffff;
+  --mbchat-surface2:#f8fafc;
+  --mbchat-border:rgba(2,6,23,.12);
+  --mbchat-text:#0f172a;
+  --mbchat-muted:#475569;
+  --mbchat-shadow:0 18px 50px rgba(0,0,0,.18);
+  --mbchat-radius:16px;
+  --mbchat-radius2:20px;
+  --mbchat-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+}
+
+/* botão flutuante */
+#mbchatFab{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  width:54px;
+  height:54px;
+  border-radius:999px;
+  background:var(--mbchat-primary);
+  border:2px solid rgba(255,255,255,.15);
+  box-shadow:var(--mbchat-shadow);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  z-index:9999;
+}
+#mbchatFab svg{ width:22px; height:22px; fill:var(--mbchat-accent); }
+#mbchatFab:hover{ transform:translateY(-1px); }
+
+/* painel */
+#mbchatPanel{
+  position:fixed;
+  right:20px;
+  bottom:86px;
+  width:min(380px, calc(100vw - 40px));
+  height:min(560px, calc(100vh - 130px));
+  background:var(--mbchat-surface);
+  border:1px solid var(--mbchat-border);
+  border-radius:var(--mbchat-radius2);
+  box-shadow:var(--mbchat-shadow);
+  overflow:hidden;
+  display:none;
+  z-index:9999;
+  font-family:var(--mbchat-font);
+}
+#mbchatPanel.open{ display:flex; flex-direction:column; }
+
+.mbchat-header{
+  padding:12px 14px;
+  background:var(--mbchat-primary);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.mbchat-headerLeft{ display:flex; align-items:center; gap:10px; min-width:0; }
+.mbchat-logo{
+  width:34px;
+  height:34px;
+  border-radius:12px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.18);
+  display:grid;
+  place-items:center;
+  font-weight:900;
+  letter-spacing:.4px;
+  color:var(--mbchat-accent);
+  flex:0 0 auto;
+}
+.mbchat-title{ font-size:14px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mbchat-close{
+  border:none;
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  width:34px;
+  height:34px;
+  border-radius:12px;
+  cursor:pointer;
+  font-size:18px;
+  line-height:1;
+}
+
+.mbchat-chat{
+  padding:12px;
+  flex:1;
+  overflow:auto;
+  background:linear-gradient(180deg, var(--mbchat-surface2), #ffffff);
+}
+
+.mbchat-row{ display:flex; gap:8px; margin:9px 0; align-items:flex-end; }
+.mbchat-bot{ justify-content:flex-start; }
+.mbchat-user{ justify-content:flex-end; }
+
+.mbchat-bubble{
+  max-width:min(290px, 82%);
+  background:#f1f5f9;
+  border:1px solid rgba(2,6,23,.08);
+  border-radius:14px;
+  padding:10px 11px;
+  line-height:1.35;
+  color:var(--mbchat-text);
+  font-size:13px;
+}
+.mbchat-user .mbchat-bubble{
+  background:var(--mbchat-primary);
+  border-color:rgba(0,0,0,.05);
+  color:#fff;
+}
+.mbchat-time{ font-size:11px; color:rgba(15,23,42,.55); margin:0 4px 2px; }
+.mbchat-user .mbchat-time{ color:rgba(255,255,255,.65); }
+
+.mbchat-chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+.mbchat-chip{
+  border:1px solid rgba(2,6,23,.14);
+  background:#fff;
+  color:var(--mbchat-text);
+  padding:8px 10px;
+  border-radius:999px;
+  cursor:pointer;
+  user-select:none;
+  transition:.15s ease;
+  font-weight:700;
+  font-size:12.5px;
+}
+.mbchat-chip:hover{ transform:translateY(-1px); border-color:rgba(0,21,41,.35); }
+.mbchat-chip.primary{
+  background:rgba(255,193,7,.18);
+  border-color:rgba(255,193,7,.55);
+}
+
+.mbchat-card{
+  background:#fff;
+  border:1px solid rgba(2,6,23,.10);
+  border-radius:14px;
+  padding:11px;
+  margin-top:9px;
+}
+.mbchat-card h4{ margin:0 0 6px; font-size:12px; color:var(--mbchat-muted); font-weight:900; letter-spacing:.2px; }
+.mbchat-card p{ margin:0; color:var(--mbchat-text); font-size:13px; }
+
+/* composer */
+.mbchat-composer{
+  border-top:1px solid rgba(2,6,23,.10);
+  background:#fff;
+  padding:10px 12px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.mbchat-composer input{
+  flex:1;
+  height:38px;
+  border-radius:12px;
+  border:1px solid rgba(2,6,23,.12);
+  background:#fff;
+  color:var(--mbchat-text);
+  padding:0 12px;
+  outline:none;
+  font-family:var(--mbchat-font);
+  font-size:13px;
+}
+.mbchat-composer input::placeholder{ color:rgba(71,85,105,.85); }
+.mbchat-composer button{
+  height:38px;
+  border:none;
+  border-radius:12px;
+  padding:0 14px;
+  font-weight:900;
+  cursor:pointer;
+  color:#fff;
+  background:var(--mbchat-primary);
+  border:1px solid rgba(0,0,0,.05);
+  white-space:nowrap;
+  font-size:13px;
+}
+.mbchat-composer button:disabled{ opacity:.55; cursor:not-allowed; }
+
+/* modal */
+#mbchatModalWrap{
+  position:fixed; inset:0;
+  display:none;
+  background:rgba(0,0,0,.45);
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  z-index:10000;
+}
+#mbchatModalWrap.open{ display:flex; }
+.mbchat-modal{
+  width:min(680px, 100%);
+  background:var(--mbchat-surface);
+  border:1px solid rgba(2,6,23,.14);
+  border-radius:18px;
+  box-shadow:var(--mbchat-shadow);
+  overflow:hidden;
+  font-family:var(--mbchat-font);
+}
+.mbchat-modalHeader{
+  padding:12px 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--mbchat-primary);
+  color:#fff;
+}
+.mbchat-modalHeader strong{ font-size:14px; font-weight:900; }
+.mbchat-closeBtn{
+  border:none;
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  width:34px;height:34px;
+  border-radius:12px;
+  cursor:pointer;
+  font-size:18px;
+}
+.mbchat-modalBody{ padding:14px; }
+.mbchat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.mbchat-field{ display:flex; flex-direction:column; gap:6px; }
+.mbchat-field label{ font-size:12px; color:var(--mbchat-muted); font-weight:900; }
+.mbchat-field input, .mbchat-field select, .mbchat-field textarea{
+  border-radius:12px;
+  border:1px solid rgba(2,6,23,.12);
+  background:#fff;
+  color:var(--mbchat-text);
+  padding:10px 12px;
+  outline:none;
+  font-family:var(--mbchat-font);
+  font-size:13px;
+}
+.mbchat-field textarea{ min-height:110px; resize:vertical; }
+.mbchat-note{ font-size:12px; color:rgba(71,85,105,.9); line-height:1.35; }
+.mbchat-modalFooter{
+  padding:12px 14px;
+  border-top:1px solid rgba(2,6,23,.10);
+  display:flex;
+  gap:10px;
+  justify-content:flex-end;
+  background:#fff;
+}
+.mbchat-btn{
+  border:none;
+  border-radius:12px;
+  padding:10px 12px;
+  font-weight:900;
+  cursor:pointer;
+  color:#0f172a;
+  background:#f1f5f9;
+  font-size:13px;
+}
+.mbchat-btn.primary{ background:var(--mbchat-primary); color:#fff; }
+.mbchat-btn.danger{ background:rgba(239,68,68,.12); color:#991b1b; border:1px solid rgba(239,68,68,.35); }
+
+@media (max-width:720px){
+  .mbchat-grid{ grid-template-columns:1fr; }
+  #mbchatPanel{ right:12px; left:12px; width:auto; }
+  #mbchatFab{ right:14px; bottom:14px; }
+}
+</style>
+
+</head>
+<body class="text-gray-800">
+
+    <!-- ================================================================== -->
+    <!-- TELA 1: LOGIN (Design preferido restaurado)                       -->
+    <!-- ================================================================== -->
+    <div id="screen-login" class="h-full w-full flex flex-col items-center justify-center p-4 relative overflow-hidden login-bg z-50 absolute inset-0">
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+            <div class="absolute -top-40 -right-40 w-96 h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
+            <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
+        </div>
+
+        <main class="w-full max-w-[420px] bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/50 overflow-hidden fade-in">
+            <div class="pt-10 pb-6 px-8 text-center bg-white">
+                <div class="flex flex-col items-center justify-center mb-6">
+                    <img src="https://hmportal.morebuzz.com.br/img/home/MoreBuzz.png" alt="Logo More Buzz" class="h-14 object-contain mb-2 hover:scale-105 transition-transform duration-300">
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">Acesso ao Portal</h1>
+                <p class="text-sm text-gray-500 font-medium">Entre com seu e-mail e senha para continuar.</p>
+            </div>
+
+            <div class="px-8 pb-8 pt-2">
+                <form onsubmit="event.preventDefault(); performLogin();" class="space-y-5">
+                    <div class="group">
+                        <label class="block text-sm font-bold text-gray-700 mb-1.5 ml-1">E-mail <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none h-12"><i class="fa-regular fa-envelope text-gray-400"></i></div>
+                            <input type="email" required class="block w-full h-12 pl-11 pr-4 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-buzzBlue/20 focus:border-buzzBlue transition-all bg-gray-50 focus:bg-white text-sm font-medium" placeholder="seu@email.com">
+                        </div>
+                    </div>
+                    <div class="group">
+                        <label class="block text-sm font-bold text-gray-700 mb-1.5 ml-1">Senha <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none h-12"><i class="fa-solid fa-lock text-gray-400"></i></div>
+                            <input type="password" id="login-pass" required class="block w-full h-12 pl-11 pr-12 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-buzzBlue/20 focus:border-buzzBlue transition-all bg-gray-50 focus:bg-white text-sm font-medium" placeholder="••••••••">
+                            <button type="button" onclick="toggleLoginPass()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center h-12 text-gray-400 hover:text-buzzBlue cursor-pointer focus:outline-none"><i class="fa-regular fa-eye text-lg" id="login-eye"></i></button>
+                        </div>
+                        <div class="flex justify-end mt-2"><a href="#" class="text-xs font-semibold text-buzzBlue hover:underline">Esqueci minha senha</a></div>
+                    </div>
+                    <button type="submit" id="btn-login-submit" class="w-full flex justify-center items-center h-12 bg-buzzBlue hover:bg-buzzBlueLight text-white rounded-xl text-sm font-bold shadow-lg transition-all transform hover:-translate-y-0.5"><span>ENTRAR</span><i class="fa-solid fa-arrow-right ml-2 opacity-70"></i></button>
+                </form>
+            </div>
+            <div class="bg-gray-50 border-t border-gray-100 px-8 py-5 text-center">
+                <p class="text-sm text-gray-600 font-medium">Ainda não é divulgador? <a href="#" class="text-buzzBlue font-bold hover:underline ml-1">Criar conta</a></p>
+            </div>
+        </main>
+        <footer class="mt-8 text-center"><p class="text-[10px] text-gray-400 font-mono">Versão 2.0.4.0</p></footer>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- TELA 2: SISTEMA (Identidade More Buzz aplicada ao seu layout)      -->
+    <!-- ================================================================== -->
+    <div id="screen-system" class="hidden h-full w-full flex overflow-hidden fade-in relative z-10">
+
+        <!-- SIDEBAR DESKTOP -->
+        <aside class="hidden md:flex flex-col w-64 bg-buzzBlue text-white transition-all duration-300 shadow-xl z-30 flex-shrink-0">
+            <div class="h-16 flex items-center justify-center border-b border-buzzBlueLight bg-buzzBlueLight px-4 safe-area-top">
+                <img src="https://www.morebuzz.com.br/wp-content/uploads/2024/11/morebuzz-negativo.png" alt="More Buzz" class="h-10 object-contain">
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 custom-scroll no-scrollbar">
+                <ul class="space-y-1">
+                    <li><button onclick="nav('home')" id="d-nav-home" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-indigo-100 hover:bg-buzzBlueLight hover:text-white transition-colors active"><i class="fa-solid fa-house w-5 text-center"></i> Home</button></li>
+                    <li><button onclick="nav('indicacoes')" id="d-nav-indicacoes" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-indigo-100 hover:bg-buzzBlueLight hover:text-white transition-colors"><i class="fa-solid fa-users w-5 text-center"></i> Minhas Indicações</button></li>
+                    <li><button onclick="nav('financeiro')" id="d-nav-financeiro" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-indigo-100 hover:bg-buzzBlueLight hover:text-white transition-colors"><i class="fa-solid fa-wallet w-5 text-center"></i> Meu dinheiro</button></li>
+                    <li><button onclick="nav('marketing')" id="d-nav-marketing" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-indigo-100 hover:bg-buzzBlueLight hover:text-white transition-colors"><i class="fa-solid fa-bullhorn w-5 text-center"></i> Material de divulgação</button></li>
+                    <li><button onclick="nav('links')" id="d-nav-links" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-indigo-100 hover:bg-buzzBlueLight hover:text-white transition-colors"><i class="fa-solid fa-link w-5 text-center"></i> Meu link de indicação</button></li>
+                    <li><button onclick="nav('ajuda')" id="d-nav-ajuda" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-indigo-100 hover:bg-buzzBlueLight hover:text-white transition-colors"><i class="fa-regular fa-circle-question w-5 text-center"></i> Central de ajuda</button></li>
+                    <li><button onclick="nav('chamados')" id="d-nav-chamados" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-indigo-100 hover:bg-buzzBlueLight hover:text-white transition-colors"><i class="fa-solid fa-ticket w-5 text-center"></i> Meus Chamados</button></li>
+                </ul>
+                <div class="mt-4 pt-4 border-t border-buzzBlueLight space-y-1">
+                    <button onclick="nav('perfil')" id="d-nav-perfil" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-indigo-200 hover:text-white transition-colors text-sm"><i class="fa-solid fa-user-gear w-5 text-center"></i> Meu perfil</button>
+                </div>
+            </nav>
+            <div class="p-4 text-xs text-indigo-300 text-center border-t border-buzzBlueLight safe-area-bottom">&copy; 2025 MORE BUZZ</div>
+        </aside>
+
+        <!-- SIDEBAR MOBILE -->
+        <div id="mob-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
+        <aside id="mobile-sidebar" class="fixed inset-y-0 left-0 w-72 bg-buzzBlue text-white shadow-2xl z-50 transform -translate-x-full md:hidden flex flex-col transition-transform duration-300">
+            <div class="h-16 flex items-center justify-between px-6 border-b border-buzzBlueLight bg-buzzBlueLight safe-area-top">
+                <img src="https://www.morebuzz.com.br/wp-content/uploads/2024/11/morebuzz-negativo.png" alt="More Buzz" class="h-8 object-contain">
+                <button onclick="toggleSidebar()" class="text-white hover:text-gray-300"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4 custom-scroll no-scrollbar">
+                <ul class="space-y-1">
+                    <li><button onclick="nav('home')" id="m-nav-home" class="nav-item w-full flex items-center gap-3 px-6 py-4 text-indigo-100 active"><i class="fa-solid fa-house w-5 text-center"></i> Home</button></li>
+                    <li><button onclick="nav('indicacoes')" id="m-nav-indicacoes" class="nav-item w-full flex items-center gap-3 px-6 py-4 text-indigo-100"><i class="fa-solid fa-users w-5 text-center"></i> Minhas Indicações</button></li>
+                    <li><button onclick="nav('financeiro')" id="m-nav-financeiro" class="nav-item w-full flex items-center gap-3 px-6 py-4 text-indigo-100"><i class="fa-solid fa-wallet w-5 text-center"></i> Meu dinheiro</button></li>
+                    <li><button onclick="nav('marketing')" id="m-nav-marketing" class="nav-item w-full flex items-center gap-3 px-6 py-4 text-indigo-100"><i class="fa-solid fa-bullhorn w-5 text-center"></i> Material de divulgação</button></li>
+                    <li><button onclick="nav('links')" id="m-nav-links" class="nav-item w-full flex items-center gap-3 px-6 py-4 text-indigo-100"><i class="fa-solid fa-link w-5 text-center"></i> Meu link</button></li>
+                    <li><button onclick="nav('ajuda')" id="m-nav-ajuda" class="nav-item w-full flex items-center gap-3 px-6 py-4 text-indigo-100"><i class="fa-regular fa-circle-question w-5 text-center"></i> Central de ajuda</button></li>
+                    <li><button onclick="nav('chamados')" id="m-nav-chamados" class="nav-item w-full flex items-center gap-3 px-6 py-4 text-indigo-100"><i class="fa-solid fa-ticket w-5 text-center"></i> Meus Chamados</button></li>
+                    <li><button onclick="nav('perfil')" id="m-nav-perfil" class="nav-item w-full flex items-center gap-3 px-6 py-4 text-indigo-200 border-t border-buzzBlueLight mt-2"><i class="fa-solid fa-user-gear w-5 text-center"></i> Meu perfil</button></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- ÁREA CENTRAL -->
+        <div class="flex-1 flex flex-col h-screen overflow-hidden relative w-full min-w-0">
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 shadow-sm z-20 flex-shrink-0 safe-area-top">
+                <button onclick="toggleSidebar()" class="md:hidden text-buzzBlue p-2"><i class="fa-solid fa-bars text-xl"></i></button>
+                <div class="md:hidden flex items-center"><img src="https://hmportal.morebuzz.com.br/img/home/MoreBuzz.png" alt="Logo" class="h-8"></div>
+                
+                <div class="flex items-center gap-4 ml-auto">
+                    <div class="flex items-center gap-3 cursor-pointer" onclick="nav('perfil')">
+                        <div class="hidden sm:block text-right"><p class="text-sm font-semibold text-gray-800 uppercase">AMAURI</p><p class="text-xs text-gray-500 font-bold uppercase tracking-tighter">Divulgador</p></div>
+                        <div class="w-10 h-10 rounded-full bg-buzzYellow flex items-center justify-center text-buzzBlue font-bold border border-buzzYellow shadow-sm"><i class="fa-solid fa-user"></i></div>
+                    </div>
+                    <div class="h-8 w-px bg-gray-300 mx-2 hidden sm:block"></div>
+                    <button onclick="performLogout()" class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1 transition-colors"><span class="hidden sm:inline">Sair</span><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 relative w-full custom-scroll">
+                
+                <!-- 1. HOME (Exatamente seu original) -->
+                <section id="pg-home" class="page-section active max-w-6xl mx-auto space-y-8">
+                    <div class="bg-yellow-50 border border-buzzYellow rounded-xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-buzzYellow p-3 rounded-full text-buzzBlue"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
+                            <div><h2 class="text-lg font-bold text-yellow-800">Complete seus dados bancários</h2><p class="text-sm text-yellow-700">Para receber suas recompensas, informe Agência, Conta e Tipo.</p></div>
+                        </div>
+                        <button onclick="goPerfilBank()" class="w-full md:w-auto px-6 py-3 bg-buzzYellow text-buzzBlue font-bold rounded-lg shadow-sm text-sm active:scale-95 transition-all">CADASTRAR DADOS</button>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-bold text-buzzBlue mb-4 flex items-center gap-2 uppercase tracking-tighter"><i class="fa-solid fa-layer-group"></i> Produtos disponíveis para sua divulgação</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Cards Produtos com cores More Buzz -->
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center hover:border-buzzYellow transition group">
+                                <div class="w-16 h-16 rounded-full bg-indigo-50 text-buzzBlue flex items-center justify-center text-3xl mb-4 group-hover:bg-buzzYellow transition-colors"><i class="fa-solid fa-wifi"></i></div>
+                                <h4 class="text-lg font-bold text-buzzBlue mb-6">Vivo Empresas</h4>
+                                <button onclick="nav('links')" class="w-full py-3 bg-buzzBlue text-white font-bold rounded-lg text-sm mb-2 shadow-md">INDICAR AGORA</button>
+                                <button onclick="nav('marketing')" class="w-full py-3 bg-white border border-gray-200 text-gray-500 font-medium rounded-lg text-sm">RECOMPENSAS</button>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center hover:border-buzzYellow transition group">
+                                <div class="w-16 h-16 rounded-full bg-blue-50 text-buzzBlue flex items-center justify-center text-3xl mb-4 group-hover:bg-buzzYellow transition-colors"><i class="fa-solid fa-car-side"></i></div>
+                                <h4 class="text-lg font-bold text-buzzBlue mb-6">Consórcios</h4>
+                                <button onclick="nav('links')" class="w-full py-3 bg-buzzBlue text-white font-bold rounded-lg text-sm mb-2 shadow-md">INDICAR AGORA</button>
+                                <button onclick="nav('marketing')" class="w-full py-3 bg-white border border-gray-200 text-gray-500 font-medium rounded-lg text-sm">RECOMPENSAS</button>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center hover:border-buzzYellow transition group">
+                                <div class="w-16 h-16 rounded-full bg-red-50 text-buzzBlue flex items-center justify-center text-3xl mb-4 group-hover:bg-buzzYellow transition-colors"><i class="fa-solid fa-heart-pulse"></i></div>
+                                <h4 class="text-lg font-bold text-buzzBlue mb-6">Seguros</h4>
+                                <button onclick="nav('links')" class="w-full py-3 bg-buzzBlue text-white font-bold rounded-lg text-sm mb-2 shadow-md">INDICAR AGORA</button>
+                                <button onclick="nav('marketing')" class="w-full py-3 bg-white border border-gray-200 text-gray-500 font-medium rounded-lg text-sm">RECOMPENSAS</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-bold text-buzzBlue mb-4 flex items-center gap-2 uppercase tracking-tighter"><i class="fa-solid fa-chart-line"></i> Seus Resultados</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center"><div><p class="text-xs text-gray-400 uppercase font-bold tracking-widest">Indicações</p><p class="text-2xl font-bold text-buzzBlue">1</p></div><div class="w-10 h-10 bg-indigo-50 text-buzzBlue rounded-full flex items-center justify-center shadow-inner"><i class="fa-regular fa-paper-plane"></i></div></div>
+                            <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center"><div><p class="text-xs text-gray-400 uppercase font-bold tracking-widest">Negócios</p><p class="text-2xl font-bold text-green-600">1</p></div><div class="w-10 h-10 bg-green-50 text-green-600 rounded-full flex items-center justify-center shadow-inner"><i class="fa-solid fa-handshake"></i></div></div>
+                            <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center"><div><p class="text-xs text-gray-400 uppercase font-bold tracking-widest">Recompensas</p><p class="text-2xl font-bold text-buzzBlue">R$ 0,00</p></div><div class="w-10 h-10 bg-buzzYellow/20 text-buzzBlue rounded-full flex items-center justify-center shadow-inner"><i class="fa-solid fa-coins"></i></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. INDICAÇÕES -->
+                <section id="pg-indicacoes" class="page-section max-w-6xl mx-auto">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h1 class="text-2xl font-bold text-buzzBlue uppercase tracking-tight flex items-center gap-2"><i class="fa-solid fa-users text-buzzYellow"></i> Minhas Indicações</h1>
+                        <button class="bg-buzzBlue text-white px-4 py-2.5 rounded-lg text-sm font-bold w-full md:w-auto shadow-md transition-transform active:scale-95 uppercase tracking-widest"><i class="fa-solid fa-plus mr-2"></i> Nova Indicação</button>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <div class="md:col-span-5 relative"><i class="fa-solid fa-search absolute left-3 top-3.5 text-gray-400"></i><input class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-buzzYellow" placeholder="Buscar por Nome ou CPF..."></div>
+                        <div class="md:col-span-3"><select class="w-full py-2.5 px-3 border border-gray-200 rounded-lg text-sm bg-white outline-none"><option>Status: Todos</option><option>Aprovado</option></select></div>
+                        <div class="md:col-span-4"><input type="date" class="w-full py-2.5 px-3 border border-gray-200 rounded-lg text-sm text-gray-500 outline-none"></div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="overflow-x-auto no-scrollbar custom-scroll">
+                            <table class="w-full text-sm text-left min-w-[700px]">
+                                <thead class="bg-buzzBlue text-white uppercase text-[10px] tracking-widest border-b"><tr><th class="px-6 py-4">Indicado</th><th class="px-6 py-4">Produto</th><th class="px-6 py-4">Status</th><th class="px-6 py-4 text-right">Ação</th></tr></thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr class="hover:bg-gray-50 cursor-pointer"><td class="px-6 py-4"><p class="font-bold text-buzzBlue">Amauri T.</p><p class="text-[10px] text-gray-400 font-mono">CPF: ***.456.***-**</p></td><td class="px-6 py-4">Vivo Empresas</td><td class="px-6 py-4"><span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Entrada</span></td><td class="px-6 py-4 text-right"><i class="fa-solid fa-chevron-right text-gray-300"></i></td></tr>
+                                    <tr class="hover:bg-gray-50 cursor-pointer"><td class="px-6 py-4"><p class="font-bold text-buzzBlue">Maria S.</p><p class="text-[10px] text-gray-400 font-mono">CPF: ***.123.***-**</p></td><td class="px-6 py-4">Consórcio</td><td class="px-6 py-4"><span class="bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Aprovado</span></td><td class="px-6 py-4 text-right"><i class="fa-solid fa-chevron-right text-gray-300"></i></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. FINANCEIRO (Fidelidade ao comportamento de chaveamento original) -->
+                <section id="pg-financeiro" class="page-section max-w-5xl mx-auto">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h1 class="text-2xl font-bold text-buzzBlue uppercase tracking-tight flex items-center gap-2"><i class="fa-solid fa-wallet text-buzzYellow"></i> Meu Dinheiro</h1>
+                        <div class="flex bg-white p-1 rounded-lg border shadow-sm"><button onclick="toggleFin('empty')" id="btn-f-empty" class="px-4 py-1.5 text-xs rounded font-bold bg-buzzBlue text-white">Vazio</button><button onclick="toggleFin('full')" id="btn-f-full" class="px-4 py-1.5 text-xs rounded font-bold text-gray-400">Dados</button></div>
+                    </div>
+                    
+                    <div id="fin-empty" class="flex flex-col items-center justify-center py-20 bg-white rounded-xl border-2 border-dashed border-gray-300 text-gray-300 shadow-inner">
+                        <i class="fa-regular fa-folder-open text-5xl mb-4"></i>
+                        <p class="font-bold">Nenhum lançamento encontrado.</p>
+                    </div>
+
+                    <div id="fin-full" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                            <div class="bg-white p-5 rounded-xl border shadow-sm overflow-hidden"><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Lançados</p><h2 class="text-2xl font-bold text-blue-600">R$ 1.250,00</h2></div>
+                            <div class="bg-white p-5 rounded-xl border shadow-sm overflow-hidden"><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Disponível</p><h2 class="text-2xl font-bold text-green-600">R$ 450,00</h2></div>
+                            <div class="bg-white p-5 rounded-xl border shadow-sm overflow-hidden"><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Solicitado</p><h2 class="text-2xl font-bold text-buzzYellow">R$ 150,00</h2></div>
+                            <div class="bg-white p-5 rounded-xl border shadow-sm overflow-hidden"><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pago</p><h2 class="text-2xl font-bold text-buzzBlue">R$ 650,00</h2></div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="lg:col-span-2 bg-buzzBlue text-white p-8 rounded-2xl shadow-xl relative overflow-hidden">
+                                <h3 class="font-bold text-buzzYellow mb-3 uppercase tracking-tighter text-lg">Regras de Resgate</h3>
+                                <ul class="text-sm text-gray-200 space-y-2 list-disc list-inside"><li>Solicitações permitidas até o <strong>5º dia útil</strong>.</li><li>Valor mínimo para saque: <strong>R$ 100,00</strong>.</li></ul>
+                                <i class="fa-solid fa-piggy-bank absolute -right-4 -bottom-4 text-white opacity-5 text-9xl rotate-12"></i>
+                            </div>
+                            <div class="bg-white border p-6 rounded-2xl text-center shadow-lg flex flex-col justify-center items-center">
+                                <button class="w-full bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-green-600 active:scale-95 transition-all uppercase tracking-widest text-xs">SOLICITAR SAQUE</button>
+                                <p class="text-[10px] text-gray-400 mt-4 uppercase font-bold tracking-widest">Processamento em até 48h</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. MARKETING -->
+                <section id="pg-marketing" class="page-section max-w-6xl mx-auto space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-start gap-4">
+                            <div class="hidden sm:flex bg-buzzYellow/10 p-4 rounded-full text-buzzBlue shadow-inner"><i class="fa-solid fa-hand-sparkles text-2xl"></i></div>
+                            <div>
+                                <h1 class="text-2xl font-bold text-buzzBlue mb-2">Olá, Amauri!</h1>
+                                <p class="text-gray-500 text-sm leading-relaxed max-w-2xl font-medium">Este é seu Hub de Marketing. Baixe materiais exclusivos para impulsionar suas vendas.</p>
+                            </div>
+                        </div>
+                        <button class="bg-buzzBlue text-buzzYellow px-6 py-3 rounded-xl font-bold text-[10px] flex items-center gap-2 transition-all shadow-md active:scale-95 uppercase tracking-widest"><i class="fa-regular fa-file-pdf text-lg"></i> GUIA PRÁTICO</button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Acordeão Original -->
+                        <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+                            <button onclick="toggleAcc('mkt-vivo')" class="w-full px-6 py-5 flex items-center justify-between hover:bg-gray-50 transition outline-none">
+                                <div class="flex items-center gap-4 text-left">
+                                    <div class="w-12 h-12 bg-gray-50 text-buzzBlue rounded-lg flex items-center justify-center text-2xl shadow-inner"><i class="fa-solid fa-wifi"></i></div>
+                                    <div><h3 class="font-bold text-buzzBlue text-lg uppercase tracking-tighter">Vivo Empresas</h3><p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Posts para Feed e Stories</p></div>
+                                </div>
+                                <i id="icon-mkt-vivo" class="fa-solid fa-chevron-down text-gray-300 transition-transform"></i>
+                            </button>
+                            <div id="mkt-vivo" class="accordion-content bg-gray-50">
+                                <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                                    <div class="bg-white border rounded-xl overflow-hidden shadow-sm hover:border-buzzYellow transition">
+                                        <div class="aspect-square bg-gray-100 flex items-center justify-center text-gray-300 relative"><i class="fa-regular fa-image text-3xl"></i><span class="absolute top-2 right-2 bg-buzzBlue text-white text-[8px] font-bold px-2 py-1 rounded uppercase">FEED</span></div>
+                                        <div class="p-3"><p class="font-bold text-buzzBlue text-xs mb-3 truncate uppercase tracking-tighter">Fibra Óptica</p><button class="w-full bg-buzzBlue text-white text-[10px] font-bold py-2 rounded-lg active:scale-95 transition-all">BAIXAR</button></div>
+                                    </div>
+                                    <div class="bg-white border rounded-xl overflow-hidden shadow-sm hover:border-buzzYellow transition">
+                                        <div class="aspect-[9/16] bg-gray-100 flex items-center justify-center text-gray-300 relative"><i class="fa-solid fa-mobile-screen text-3xl"></i><span class="absolute top-2 right-2 bg-buzzYellow text-buzzBlue text-[8px] font-bold px-2 py-1 rounded uppercase">STORIES</span></div>
+                                        <div class="p-3"><p class="font-bold text-buzzBlue text-xs mb-3 truncate uppercase tracking-tighter">Promoção Móvel</p><button class="w-full bg-buzzBlue text-white text-[10px] font-bold py-2 rounded-lg active:scale-95 transition-all">BAIXAR</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. LINKS (Fiel ao original) -->
+                <section id="pg-links" class="page-section max-w-4xl mx-auto space-y-6">
+                    <h1 class="text-2xl font-bold text-buzzBlue uppercase tracking-tight flex items-center gap-2"><i class="fa-solid fa-link text-buzzYellow"></i> Meus Links</h1>
+                    <div class="bg-white rounded-2xl border shadow-sm overflow-hidden border-gray-100">
+                        <div class="p-6 bg-gray-50 border-b">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Produto para Indicação</label>
+                            <select class="w-full border rounded-xl p-3 bg-white text-sm outline-none focus:ring-1 focus:ring-buzzYellow transition-all"><option>Vivo Empresas</option><option>Consórcio Roma</option></select>
+                        </div>
+                        <div class="p-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Seu Link</label>
+                                <div class="flex mt-2 mb-2"><input id="lnk-inp" readonly class="flex-1 border rounded-l-xl px-4 py-3 text-sm text-gray-500 bg-gray-50 outline-none select-all font-mono" value="https://hm.mbuzz.com.br/vivo/amauri"><button onclick="cpLnk()" class="bg-buzzYellow text-buzzBlue px-6 rounded-r-xl font-bold text-xs uppercase tracking-widest shadow-md active:scale-95 transition-all">Copiar</button></div>
+                                <p id="cp-msg" class="text-green-600 text-[10px] font-bold hidden mt-1"><i class="fa-solid fa-check"></i> Link copiado!</p>
+                                <div class="mt-8 flex items-center gap-4 p-5 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50"><i class="fa-solid fa-qrcode text-5xl text-buzzBlue"></i><div><p class="font-bold text-buzzBlue text-sm uppercase">QR Code</p><button class="text-buzzYellow text-[10px] font-bold hover:underline uppercase">Baixar JPG</button></div></div>
+                            </div>
+                            <div class="bg-gray-50 rounded-2xl p-6 flex flex-col items-center justify-center text-center border border-gray-100 opacity-60">
+                                <i class="fa-solid fa-paintbrush text-buzzBlue text-4xl mb-3"></i>
+                                <h4 class="font-bold text-buzzBlue text-xs uppercase tracking-widest">Apoio Visual</h4>
+                                <p class="text-[10px] text-gray-400 mt-2 uppercase font-bold tracking-tighter">Use as artes do hub para converter mais.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. AJUDA -->
+                <section id="pg-ajuda" class="page-section max-w-6xl mx-auto space-y-6">
+                    <h1 class="text-2xl font-bold text-buzzBlue uppercase tracking-tight flex items-center gap-2"><i class="fa-regular fa-circle-question text-buzzYellow"></i> Central de Ajuda</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-white rounded-xl border shadow-sm divide-y">
+                            <button onclick="toggleAcc('faq1')" class="w-full px-6 py-5 flex justify-between items-center hover:bg-gray-50 outline-none transition-all"><span class="font-bold text-sm text-buzzBlue text-left">Como recebo meu pagamento?</span><i id="icon-faq1" class="fa-solid fa-chevron-down text-gray-300 transition-transform"></i></button>
+                            <div id="faq1" class="accordion-content bg-gray-50"><p class="p-6 text-sm text-gray-500 leading-relaxed">As recompensas são processadas mensalmente após a validação das indicações. Cadastre sua conta bancária corretamente no perfil.</p></div>
+                        </div>
+                        <div class="bg-buzzBlue text-white rounded-2xl p-10 flex flex-col items-center justify-center text-center shadow-2xl relative overflow-hidden">
+                            <div class="w-16 h-16 bg-buzzYellow text-buzzBlue rounded-full flex items-center justify-center text-3xl shadow-xl mb-4 relative z-10"><i class="fa-solid fa-headset"></i></div>
+                            <h3 class="font-bold text-lg text-buzzYellow mb-2 uppercase tracking-tighter relative z-10">Precisa de Suporte?</h3>
+                            <p class="text-sm text-gray-300 mb-8 max-w-xs relative z-10">Se não encontrou sua dúvida, abra um chamado agora mesmo.</p>
+                            <button onclick="nav('chamados')" class="bg-buzzYellow text-buzzBlue font-bold py-4 px-10 rounded-xl shadow-lg hover:shadow-buzzYellow/20 active:scale-95 transition-all text-xs uppercase tracking-widest relative z-10">ABRIR CHAMADO AGORA</button>
+                            <i class="fa-solid fa-comments absolute -right-4 -bottom-4 text-white opacity-5 text-9xl -rotate-12"></i>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. CHAMADOS (Kanban Totalmente Restaurado) -->
+                <section id="pg-chamados" class="page-section max-w-7xl mx-auto h-[calc(100vh-160px)]">
+                    <div class="flex flex-col h-full">
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div><h1 class="text-2xl font-bold text-buzzBlue flex items-center gap-2 uppercase tracking-tight"><i class="fa-solid fa-ticket text-buzzYellow"></i> Meus Chamados</h1><p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Controle seus atendimentos</p></div>
+                            <button onclick="openModal('mod-novo-chamado')" class="bg-buzzBlue text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg flex items-center gap-2 active:scale-95 transition-all uppercase tracking-widest"><i class="fa-solid fa-plus text-buzzYellow"></i> Novo Chamado</button>
+                        </div>
+                        <div class="kanban-container flex-1 custom-scroll no-scrollbar">
+                            <div class="kanban-column bg-gray-100/60 rounded-2xl p-3 flex flex-col border border-gray-200">
+                                <div class="flex items-center justify-between mb-4 px-2"><h3 class="font-bold text-buzzBlue text-[10px] uppercase tracking-widest">Aberto</h3><span class="bg-buzzBlue text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">1</span></div>
+                                <div class="space-y-3 overflow-y-auto pr-1 flex-1 no-scrollbar custom-scroll">
+                                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-buzzBlue cursor-pointer hover:shadow-md transition active:scale-95">
+                                        <div class="flex justify-between items-start mb-2"><span class="bg-blue-50 text-blue-700 text-[8px] font-bold px-2 py-0.5 rounded uppercase font-mono tracking-tighter">Financeiro</span><span class="text-[8px] text-gray-400 font-bold">#1023</span></div>
+                                        <h4 class="font-bold text-xs text-buzzBlue mb-1 uppercase tracking-tighter">Dúvida comissão</h4>
+                                        <p class="text-[10px] text-gray-500 line-clamp-2 leading-tight">Referente a indicação Amauri Teste.</p>
+                                        <div class="mt-4 flex items-center gap-2 text-[9px] text-gray-400 font-bold"><i class="fa-regular fa-clock"></i> 10/01/2026</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="kanban-column bg-blue-50/50 rounded-2xl p-3 flex flex-col border border-blue-100/50"><div class="flex items-center justify-between mb-4 px-2"><h3 class="font-bold text-blue-800 text-[10px] uppercase tracking-widest">Atendimento</h3><span class="bg-blue-200 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span></div></div>
+                            <div class="kanban-column bg-yellow-50/50 rounded-2xl p-3 flex flex-col border border-yellow-100/50"><div class="flex items-center justify-between mb-4 px-2"><h3 class="font-bold text-yellow-800 text-[10px] uppercase tracking-widest">Pendente</h3><span class="bg-yellow-200 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span></div></div>
+                            <div class="kanban-column bg-green-50/50 rounded-2xl p-3 flex flex-col border border-green-100/50"><div class="flex items-center justify-between mb-4 px-2"><h3 class="font-bold text-green-800 text-[10px] uppercase tracking-widest">Finalizado</h3><span class="bg-green-200 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. PERFIL (Com todos os modais restaurados) -->
+                <section id="pg-perfil" class="page-section max-w-5xl mx-auto space-y-6 pb-20">
+                    <h1 class="text-2xl font-bold text-buzzBlue uppercase tracking-tight flex items-center gap-2"><i class="fa-solid fa-id-card text-buzzYellow"></i> Perfil do Divulgador</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Card Dados -->
+                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                            <div class="px-6 py-4 border-b bg-buzzBlue text-white font-bold text-xs flex items-center gap-2 uppercase tracking-widest"><i class="fa-regular fa-user text-buzzYellow"></i> Dados Pessoais</div>
+                            <div class="p-8 space-y-6 flex-1">
+                                <div><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Nome Completo</label><p id="view-nome" class="font-bold text-buzzBlue text-base">AMAURI TESTE</p></div>
+                                <div><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">E-mail</label><p id="view-email" class="font-bold text-buzzBlue text-sm break-all font-mono">amauri@teste.com</p></div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Documento</label><p id="view-doc" class="font-mono text-buzzBlue font-bold text-sm">37.914.107/0001-55</p></div>
+                                    <div><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Telefone</label><p id="view-tel" class="font-mono text-buzzBlue font-bold text-sm">(11) 99999-8888</p></div>
+                                </div>
+                            </div>
+                            <div class="p-4 border-t bg-gray-50"><button onclick="openModal('mod-pessoal')" class="w-full bg-white border border-gray-200 text-buzzBlue font-bold py-3 rounded-xl text-xs hover:bg-buzzYellow transition-colors shadow-sm uppercase tracking-widest">EDITAR DADOS</button></div>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                                <div class="flex justify-between items-center mb-6"><span class="font-bold text-buzzBlue text-xs uppercase tracking-widest"><i class="fa-solid fa-map-pin mr-2 text-buzzYellow"></i> Endereço</span><button onclick="openModal('mod-end')" class="text-[10px] font-bold text-buzzBlue hover:underline uppercase tracking-tighter">Alterar</button></div>
+                                <div id="addr-none" class="text-center py-4 text-gray-300 italic text-xs">Nenhum endereço vinculado.</div>
+                                <div id="addr-show" class="hidden text-sm space-y-1"><p id="v-rua" class="font-bold text-buzzBlue"></p><p id="v-cid" class="text-gray-400 font-bold"></p></div>
+                            </div>
+                            <div class="bg-white rounded-2xl border border-gray-100 shadow-xl p-8 border-buzzYellow/20">
+                                <div class="flex justify-between items-center mb-6"><span class="font-bold text-buzzBlue text-xs uppercase tracking-widest"><i class="fa-solid fa-building-columns mr-2 text-buzzYellow"></i> Banco</span><span id="bank-status" class="bg-red-100 text-red-600 text-[8px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">Pendente</span></div>
+                                <div class="space-y-4 mb-6">
+                                    <p id="v-banco" class="text-xs italic text-gray-300">Dados não informados</p>
+                                    <div class="flex gap-4 font-mono text-sm font-bold text-buzzBlue"><span id="v-ag"></span> <span id="v-cc"></span></div>
+                                </div>
+                                <button onclick="openModal('mod-bank')" class="w-full bg-buzzYellow text-buzzBlue font-bold py-3.5 rounded-xl text-xs shadow-lg hover:bg-buzzYellowHover transition-all uppercase tracking-widest active:scale-95">Validar Dados Bancários</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- SIDEBAR MOBILE -->
+    <div id="mob-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-buzzBlue/80 z-[1001] hidden backdrop-blur-sm transition-opacity duration-300"></div>
+    <aside id="mobile-sidebar" class="fixed inset-y-0 left-0 w-72 bg-buzzBlue text-white shadow-2xl z-[1002] transform -translate-x-full transition-transform duration-300 md:hidden flex flex-col">
+        <div class="h-16 flex items-center justify-between px-6 bg-buzzBlueLight safe-area-top">
+            <img src="https://www.morebuzz.com.br/wp-content/uploads/2024/11/morebuzz-negativo.png" alt="More Buzz" class="h-8">
+            <button onclick="toggleSidebar()" class="text-white hover:text-buzzYellow transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
+        </div>
+        <nav class="flex-1 py-6 custom-scroll overflow-y-auto no-scrollbar">
+            <ul class="space-y-1 px-4">
+                <li><button onclick="nav('home')" class="w-full flex items-center gap-4 py-4 text-gray-400 hover:text-white transition-all font-bold uppercase text-[10px] tracking-widest"><i class="fa-solid fa-house"></i> Home</button></li>
+                <li><button onclick="nav('indicacoes')" class="w-full flex items-center gap-4 py-4 text-gray-400 hover:text-white transition-all font-bold uppercase text-[10px] tracking-widest"><i class="fa-solid fa-users"></i> Indicações</button></li>
+                <li><button onclick="nav('financeiro')" class="w-full flex items-center gap-4 py-4 text-gray-400 hover:text-white transition-all font-bold uppercase text-[10px] tracking-widest"><i class="fa-solid fa-wallet"></i> Financeiro</button></li>
+                <li><button onclick="nav('links')" class="w-full flex items-center gap-4 py-4 text-gray-400 hover:text-white transition-all font-bold uppercase text-[10px] tracking-widest"><i class="fa-solid fa-link"></i> Meus Links</button></li>
+                <li><button onclick="nav('perfil')" class="w-full flex items-center gap-4 py-4 text-gray-400 border-t border-buzzBlueLight mt-4 pt-6"><i class="fa-solid fa-user-gear"></i> Perfil</button></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- ================================================================== -->
+    <!-- MODAIS RESTAURADOS (Z-INDEX SUPERIOR PARA SAFARI)                 -->
+    <!-- ================================================================== -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-buzzBlue/80 z-[11000] hidden backdrop-blur-sm transition-opacity" onclick="closeAll()"></div>
+    
+    <!-- Modal Novo Chamado -->
+    <div id="mod-novo-chamado" class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-[90%] max-w-lg rounded-2xl shadow-2xl z-[11001] hidden p-8">
+        <div class="flex justify-between items-center mb-6"><h3 class="font-bold text-xl text-buzzBlue uppercase tracking-tighter">Novo Chamado</h3><button onclick="closeAll()" class="text-gray-300 hover:text-buzzBlue transition-colors"><i class="fa-solid fa-times text-xl"></i></button></div>
+        <form class="space-y-4" onsubmit="event.preventDefault(); alert('Chamado registrado!'); closeAll();">
+            <div><label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Categoria</label><select class="w-full border rounded-xl p-3 text-sm bg-gray-50 outline-none"><option>Financeiro</option><option>Suporte</option></select></div>
+            <div><label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Descrição</label><textarea rows="4" required class="w-full border rounded-xl p-3 text-sm bg-gray-50 outline-none" placeholder="O que aconteceu?"></textarea></div>
+            <div class="mt-8 flex justify-end gap-4"><button type="button" onclick="closeAll()" class="text-gray-400 text-xs font-bold uppercase">Sair</button><button type="submit" class="bg-buzzBlue text-white px-8 py-3 rounded-xl text-xs font-bold shadow-lg uppercase">Enviar</button></div>
+        </form>
+    </div>
+
+    <!-- Modal Pessoal -->
+    <div id="mod-pessoal" class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-[90%] max-w-md rounded-2xl shadow-2xl z-[11001] hidden p-8">
+        <h3 class="font-bold text-buzzBlue uppercase tracking-widest text-xs mb-6 border-b pb-4">Editar Cadastro</h3>
+        <div class="space-y-4">
+            <div><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Nome Completo</label><input id="in-nome" class="w-full border rounded-xl p-3 text-sm bg-gray-50" value="AMAURI TESTE"></div>
+            <div class="grid grid-cols-2 gap-3">
+                <input id="in-doc" class="w-full border rounded-xl p-3 text-sm bg-gray-50 font-mono" placeholder="CPF/CNPJ">
+                <input id="in-tel" class="w-full border rounded-xl p-3 text-sm bg-gray-50 font-mono" placeholder="Telefone">
+            </div>
+        </div>
+        <div class="mt-8 flex justify-end gap-3"><button onclick="closeAll()" class="text-gray-400 font-bold text-[10px] uppercase">Fechar</button><button onclick="savePessoal()" class="bg-buzzBlue text-white px-6 py-3 rounded-xl text-xs font-bold shadow-md uppercase">Salvar</button></div>
+    </div>
+
+    <!-- Modal Endereço -->
+    <div id="mod-end" class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-[90%] max-w-md rounded-2xl shadow-2xl z-[11001] hidden p-8">
+        <h3 class="font-bold text-xs uppercase tracking-widest text-buzzBlue mb-6">Cadastrar Endereço</h3>
+        <div class="space-y-3">
+            <input id="in-cep" class="w-full border rounded-xl p-3 text-sm bg-gray-50" placeholder="CEP">
+            <input id="in-rua" class="w-full border rounded-xl p-3 text-sm bg-gray-50" placeholder="Logradouro + Nº">
+            <input id="in-cid" class="w-full border rounded-xl p-3 text-sm bg-gray-50" placeholder="Cidade - UF">
+        </div>
+        <div class="mt-8 flex justify-end gap-3"><button onclick="closeAll()" class="text-gray-400 font-bold text-[10px] uppercase">Sair</button><button onclick="saveEnd()" class="bg-buzzBlue text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest">Salvar</button></div>
+    </div>
+
+    <!-- Modal Banco -->
+    <div id="mod-bank" class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-[90%] max-w-md rounded-2xl shadow-2xl z-[11001] hidden p-8">
+        <h3 class="font-bold text-xs uppercase tracking-widest text-buzzBlue mb-6 border-b pb-4">Dados Bancários</h3>
+        <div class="space-y-4">
+            <select id="in-banco" class="w-full border rounded-xl p-3 text-sm bg-gray-50 outline-none"><option value="">Selecione o banco...</option><option>Nubank</option><option>Inter</option><option>Itaú</option><option>Bradesco</option></select>
+            <div class="grid grid-cols-2 gap-3">
+                <input id="in-ag" class="w-full border rounded-xl p-3 text-sm bg-gray-50" placeholder="Agência">
+                <input id="in-cc" class="w-full border rounded-xl p-3 text-sm bg-gray-50" placeholder="Conta + DV">
+            </div>
+            <div class="flex gap-4"><label class="flex items-center gap-2 text-xs font-bold text-buzzBlue"><input type="radio" name="tipo_conta" checked class="accent-buzzYellow"> Corrente</label><label class="flex items-center gap-2 text-xs font-bold text-buzzBlue"><input type="radio" name="tipo_conta" class="accent-buzzYellow"> Poupança</label></div>
+        </div>
+        <div class="mt-8 flex justify-end gap-3"><button onclick="closeAll()" class="text-gray-400 font-bold text-[10px] uppercase">Fechar</button><button onclick="saveBank()" class="bg-green-600 text-white px-8 py-3 rounded-xl text-xs font-bold shadow-lg uppercase">Validar</button></div>
+    </div>
+
+    <script>
+        // Lógica de Altura Dinâmica para Safari Mobile
+        function updateVh() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        window.addEventListener('resize', updateVh);
+        window.addEventListener('orientationchange', updateVh);
+        updateVh();
+
+        // Navegação
+        function nav(id) {
+            $('.page-section').removeClass('active');
+            $('#pg-' + id).addClass('active');
+            $('.nav-item').removeClass('active');
+            $('#d-nav-' + id).addClass('active');
+            const side = document.getElementById('mobile-sidebar');
+            if(!side.classList.contains('-translate-x-full')) toggleSidebar();
+        }
+
+        function performLogin() {
+            const btn = $('#btn-login-submit');
+            btn.attr('disabled', true).html('<i class="fa-solid fa-circle-notch fa-spin"></i> VALIDANDO...');
+            setTimeout(() => {
+                $('#screen-login').addClass('hidden');
+                $('#screen-system').removeClass('hidden');
+            }, 800);
+        }
+
+        function performLogout() { location.reload(); }
+        
+        function toggleSidebar() { 
+            $('#mobile-sidebar').toggleClass('-translate-x-full'); 
+            $('#mob-overlay').toggleClass('hidden'); 
+        }
+
+        function openModal(id) { 
+            $('#modal-backdrop').removeClass('hidden'); 
+            $('#' + id).removeClass('hidden').addClass('fade-in'); 
+        }
+
+        function closeAll() { 
+            $('#modal-backdrop').addClass('hidden'); 
+            $('[id^="mod-"]').addClass('hidden'); 
+        }
+
+        function toggleLoginPass() {
+            const i = document.getElementById('login-pass');
+            const ic = document.getElementById('login-eye');
+            i.type = i.type === 'password' ? 'text' : 'password';
+            ic.className = i.type === 'password' ? 'fa-regular fa-eye text-lg' : 'fa-regular fa-eye-slash text-lg';
+        }
+
+        // Lógica de Salvamento Perfil (Restaurado)
+        function savePessoal() {
+            $('#view-nome').text($('#in-nome').val().toUpperCase());
+            $('#view-email').text($('#in-email').val());
+            $('#view-doc').text($('#in-doc').val());
+            $('#view-tel').text($('#in-tel').val());
+            closeAll();
+        }
+
+        function saveEnd() {
+            const r = $('#in-rua').val();
+            if(!r) return;
+            $('#v-rua').text(r); 
+            $('#v-cid').text($('#in-cid').val());
+            $('#addr-none').addClass('hidden'); 
+            $('#addr-show').removeClass('hidden');
+            closeAll();
+        }
+
+        function saveBank() {
+            const b = $('#in-banco').val();
+            if(!b) return;
+            $('#v-banco').text(b).removeClass('italic text-gray-300').addClass('font-bold text-buzzBlue');
+            $('#v-ag').text($('#in-ag').val());
+            $('#v-cc').text($('#in-cc').val());
+            $('#bank-status').text('Validado').removeClass('bg-red-100 text-red-600').addClass('bg-green-100 text-green-600');
+            closeAll();
+        }
+
+        function goPerfilBank() { nav('perfil'); setTimeout(() => openModal('mod-bank'), 300); }
+        
+        function toggleAcc(id) { $('#' + id).toggleClass('open'); $('#icon-' + id).toggleClass('rotate-180'); }
+
+        function toggleFin(state) {
+            const be = $('#btn-f-empty'); const bf = $('#btn-f-full');
+            if(state === 'empty') {
+                $('#fin-empty').removeClass('hidden'); $('#fin-full').addClass('hidden');
+                be.addClass('bg-buzzBlue text-white').removeClass('text-gray-400');
+                bf.removeClass('bg-buzzBlue text-white').addClass('text-gray-400');
+            } else {
+                $('#fin-empty').addClass('hidden'); $('#fin-full').removeClass('hidden');
+                bf.addClass('bg-buzzBlue text-white').removeClass('text-gray-400');
+                be.removeClass('bg-buzzBlue text-white').addClass('text-gray-400');
+            }
+        }
+
+        function cpLnk() {
+            const input = document.getElementById('lnk-inp');
+            input.select();
+            document.execCommand('copy');
+            $('#cp-msg').removeClass('hidden');
+            setTimeout(() => $('#cp-msg').addClass('hidden'), 2000);
+        }
+
+        $(document).ready(function(){
+            updateVh();
+            // Máscaras (Fidelidade ao original)
+            if ($.fn.mask) {
+                $('#in-cep').mask('00000-000');
+                $('#in-tel').mask('(00) 00000-0000');
+                $('#in-doc').mask('00.000.000/0000-00', {onKeyPress: function(val, e, field, options) {
+                    const masks = ['000.000.000-000', '00.000.000/0000-00'];
+                    const mask = (val.length > 14) ? masks[1] : masks[0];
+                    $('#in-doc').mask(mask, options);
+                }});
+            }
+        });
+    </script>
+
+<!-- MoreBuzz Chat Widget -->
+<button id="mbchatFab" aria-label="Abrir chat de suporte" title="Suporte">
+  <!-- chat bubble icon -->
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H8l-4 3v-3H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm3 5h10v2H7V9zm0 4h7v2H7v-2z"/>
+  </svg>
+</button>
+
+<div id="mbchatPanel" class="mbchat-hidden" role="dialog" aria-label="Chat de suporte More Buzz">
+  <div class="mbchat-header">
+    <div class="mbchat-brand">
+      <div class="mbchat-logo">mb</div>
+      <div class="mbchat-title">Suporte More Buzz</div>
+    </div>
+    <button class="mbchat-close" id="mbchatClose" aria-label="Fechar chat">×</button>
+  </div>
+
+  <div id="mbchatChat" class="mbchat-chat"></div>
+
+  <div class="mbchat-composer">
+    <input id="mbchatMsgInput" placeholder="Fale como podemos ajudar" />
+    <button id="mbchatSendBtn">Enviar</button>
+  </div>
+</div>
+
+<div id="mbchatModalWrap">
+  <div class="mbchat-modal">
+    <div class="mbchat-modalHeader">
+      <strong>Abertura de Chamado</strong>
+      <button class="mbchat-closeBtn" id="mbchatCloseModalBtn">×</button>
+    </div>
+
+    <form id="mbchatTicketForm">
+      <div class="mbchat-modalBody">
+        <div class="mbchat-grid">
+          <div class="mbchat-field">
+            <label>Nome completo</label>
+            <input name="nomeCompleto" required />
+          </div>
+          <div class="mbchat-field">
+            <label>E-mail</label>
+            <input name="email" type="email" required />
+          </div>
+          <div class="mbchat-field">
+            <label>Telefone</label>
+            <input name="telefone" required />
+          </div>
+          <div class="mbchat-field">
+            <label>Tipo de solicitação</label>
+            <select name="tipoSolicitacao" required>
+              <option value="">Selecione</option>
+              <option value="duvida">Dúvida</option>
+              <option value="erro">Erro</option>
+              <option value="acesso">Acesso</option>
+              <option value="pagamento">Pagamento</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mbchat-field" style="margin-top:12px;">
+          <label>Descrição</label>
+          <textarea name="descricao" placeholder="Descreva sua solicitação com o máximo de detalhes possível"></textarea>
+          <div class="mbchat-note">Se houver evidências (print, vídeo ou arquivo), anexe abaixo.</div>
+        </div>
+
+        <div class="mbchat-field" style="margin-top:10px;">
+          <label>Anexo de evidências (opcional)</label>
+          <input name="evidencia" type="file" />
+        </div>
+      </div>
+
+      <div class="mbchat-modalFooter">
+        <button type="button" class="mbchat-btn danger" id="mbchatCancelTicketBtn">Cancelar</button>
+        <button type="submit" class="mbchat-btn primary">Enviar chamado</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MoreBuzz Chat Widget script (isolated) -->
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+(function(){
+  // ========= Endpoints (mantém compatibilidade com back) =========
+  const DEFAULT_GUIDE  = "https://n8n.srv1000189.hstgr.cloud/webhook/mb/guia";
+  const DEFAULT_TICKET = "https://n8n.srv1000189.hstgr.cloud/webhook/mb/chamado";
+
+  const qs = new URLSearchParams(location.search);
+  let GUIDE_ENDPOINT  = qs.get("guide")  || DEFAULT_GUIDE;
+  let TICKET_ENDPOINT = qs.get("ticket") || DEFAULT_TICKET;
+
+  // ========= Elements =========
+  const fab      = document.getElementById("mbchatFab");
+  const panel    = document.getElementById("mbchatPanel");
+  const closeBtn = document.getElementById("mbchatClose");
+
+  const chatEl   = document.getElementById("mbchatChat");
+  const msgInput = document.getElementById("mbchatMsgInput");
+  const sendBtn  = document.getElementById("mbchatSendBtn");
+
+  const modalWrap = document.getElementById("mbchatModalWrap");
+  const closeModalBtn = document.getElementById("mbchatCloseModalBtn");
+  const cancelTicketBtn = document.getElementById("mbchatCancelTicketBtn");
+  const ticketForm = document.getElementById("mbchatTicketForm");
+
+  // ========= State =========
+  let isSearching = false;
+  let isLoadingGuide = false;
+  let started = false;
+
+  function nowTime(){
+    const d = new Date();
+    return d.toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit"});
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function addRow(role, html){
+    const row = document.createElement("div");
+    row.className = "mbchat-row " + (role === "bot" ? "mbchat-bot" : "mbchat-user");
+
+    const bubble = document.createElement("div");
+    bubble.className = "mbchat-bubble";
+    bubble.innerHTML = html;
+
+    const time = document.createElement("div");
+    time.className = "mbchat-time";
+    time.textContent = nowTime();
+
+    if(role === "bot"){
+      row.appendChild(bubble);
+      row.appendChild(time);
+    }else{
+      row.appendChild(time);
+      row.appendChild(bubble);
+    }
+
+    chatEl.appendChild(row);
+    chatEl.scrollTop = chatEl.scrollHeight;
+    return bubble;
+  }
+
+  function addBot(text){ return addRow("bot", `<div>${escapeHtml(text)}</div>`); }
+  function addUser(text){ return addRow("user", `<div>${escapeHtml(text)}</div>`); }
+
+  function addChips(role, title, chips){
+    const bubble = addRow(role, `
+      <div><strong>${escapeHtml(title)}</strong></div>
+      <div class="mbchat-chips"></div>
+    `);
+    const chipsEl = bubble.querySelector(".mbchat-chips");
+    chips.forEach(c => {
+      const btn = document.createElement("div");
+      btn.className = "mbchat-chip " + (c.primary ? "primary" : "");
+      btn.textContent = c.label;
+      btn.onclick = c.onClick;
+      chipsEl.appendChild(btn);
+    });
+    return bubble;
+  }
+
+  function addCard(title, text){
+    return addRow("bot", `
+      <div class="mbchat-card">
+        <h4>${escapeHtml(title)}</h4>
+        <p>${escapeHtml(text)}</p>
+      </div>
+    `);
+  }
+
+  async function postJSON(url, payload){
+    const res = await fetch(url, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(()=> ({}));
+    return { ok: res.ok, status: res.status, data };
+  }
+
+  function normalizeCategories(data){
+    if(!data) return [];
+    if(Array.isArray(data.categories)){
+      return data.categories.map(c => ({
+        id: c.id ?? c.categoryId,
+        label: c.label ?? c.title ?? String(c.id ?? c.categoryId ?? "")
+      })).filter(c => c.id);
+    }
+    if(Array.isArray(data.options)){
+      return data.options.map(o => ({
+        id: o.id ?? o.categoryId,
+        label: o.label ?? o.title ?? String(o.id ?? o.categoryId ?? "")
+      })).filter(c => c.id);
+    }
+    return [];
+  }
+
+  function normalizeTopics(data){
+    if(!data) return [];
+    if(Array.isArray(data.topics)){
+      return data.topics.map(t => ({
+        topicId: t.topicId ?? t.id,
+        title: t.title ?? t.label ?? String(t.topicId ?? t.id ?? "")
+      })).filter(t => t.topicId);
+    }
+    if(Array.isArray(data.options)){
+      return data.options.map(o => ({
+        topicId: o.id,
+        title: o.label ?? String(o.id ?? "")
+      })).filter(t => t.topicId);
+    }
+    return [];
+  }
+
+  function normalizeAnswer(data){
+    const question = data?.question || data?.pergunta || "";
+    const summary  = data?.summary || data?.resumo_rapido || data?.answer_short || data?.answer || "";
+    const detail   = data?.detail || data?.answer_full || "";
+    const canExpand = typeof data?.canExpand === "boolean" ? data.canExpand : !!detail;
+    return { question, summary, detail, canExpand };
+  }
+
+  function normalizeExpand(data){
+    return data?.detail || data?.answer_full || data?.answer || "";
+  }
+
+  function normalizeSearch(data){
+    if(!data) return { options: [], confidence: 0 };
+    const options = Array.isArray(data.options) ? data.options : [];
+    return {
+      confidence: Number(data.confidence ?? 0),
+      options: options
+        .map(o => ({
+          topicId: o.id ?? o.topicId,
+          title: o.label ?? o.title ?? String(o.id ?? o.topicId ?? "")
+        }))
+        .filter(o => o.topicId)
+    };
+  }
+
+  // ========= Flow =========
+  function start(){
+    if(started) return;
+    started = true;
+
+    addBot("Olá! Seja bem-vindo ao suporte da More Buzz. Como você prefere seguir?");
+    addChips("bot", "Escolha uma opção:", [
+      { label:"Guia rápido", primary:true, onClick: () => buildGuideMenu() },
+      { label:"Abrir chamado", onClick: () => openTicketModal() },
+    ]);
+  }
+
+  async function buildGuideMenu(){
+    if(isLoadingGuide) return;
+    isLoadingGuide = true;
+
+    addUser("Guia rápido");
+
+    const { ok, data, status } = await postJSON(GUIDE_ENDPOINT, { action: "list_categories" });
+
+    if(!ok){
+      addBot(`Falha ao carregar temas. Status: ${status}`);
+      addChips("bot","O que você prefere?",[
+        {label:"Tentar de novo", primary:true, onClick:()=> buildGuideMenu()},
+        {label:"Abrir chamado", onClick:()=> openTicketModal()}
+      ]);
+      isLoadingGuide = false;
+      return;
+    }
+
+    const categories = normalizeCategories(data);
+
+    if(!categories.length){
+      addBot("Não encontrei temas disponíveis agora. Quer abrir um chamado?");
+      addChips("bot","Escolha:",[
+        {label:"Abrir chamado", primary:true, onClick:()=> openTicketModal()}
+      ]);
+      isLoadingGuide = false;
+      return;
+    }
+
+    addBot("Certo — me diz o que você quer entender 👇");
+    addChips("bot", "Escolha um tema:", categories.map(c => ({
+      label: c.label,
+      onClick: () => buildTopicsMenu(c.id, c.label)
+    })));
+
+    isLoadingGuide = false;
+  }
+
+  async function buildTopicsMenu(categoryId, categoryLabel){
+    addUser(categoryLabel);
+
+    const { ok, data, status } = await postJSON(GUIDE_ENDPOINT, {
+      action: "list_topics",
+      categoryId
+    });
+
+    if(!ok){
+      addBot(`Falha ao carregar perguntas. Status: ${status}`);
+      addChips("bot","O que você prefere?",[
+        {label:"Tentar de novo", primary:true, onClick:()=> buildTopicsMenu(categoryId, categoryLabel)},
+        {label:"Abrir chamado", onClick:()=> openTicketModal()}
+      ]);
+      return;
+    }
+
+    const topics = normalizeTopics(data);
+
+    if(!topics.length){
+      addBot("Não encontrei perguntas nesse tema. Quer abrir um chamado?");
+      addChips("bot","Escolha:",[
+        {label:"Abrir chamado", primary:true, onClick:()=> openTicketModal()},
+        {label:"Voltar ao guia", onClick:()=> buildGuideMenu()}
+      ]);
+      return;
+    }
+
+    addChips("bot", "Beleza — selecione uma opção:", topics.map(t => ({
+      label: t.title,
+      onClick: () => answerTopic(t.topicId, t.title)
+    })));
+  }
+
+  async function answerTopic(topicId, title){
+    addUser(title);
+
+    const { ok, data } = await postJSON(GUIDE_ENDPOINT, { action: "answer", topicId });
+
+    if(!ok){
+      addBot("Não consegui carregar a resposta agora. Quer abrir um chamado?");
+      addChips("bot","Escolha:",[
+        {label:"Abrir chamado", primary:true, onClick:()=> openTicketModal()},
+        {label:"Voltar ao guia", onClick:()=> buildGuideMenu()}
+      ]);
+      return;
+    }
+
+    const { question, summary, detail, canExpand } = normalizeAnswer(data);
+
+    if(question) addCard("Pergunta", question);
+    if(summary) addCard("Resposta", summary);
+    else addBot("Não encontrei resposta para esse item. Quer abrir um chamado?");
+
+    const chips = [];
+    if(canExpand){
+      chips.push({ label:"Detalhar mais", primary:true, onClick:()=> expandTopic(topicId, detail) });
+    }
+    chips.push({ label:"Resolvido", onClick:()=> resolvedFlow() });
+    chips.push({ label:"Abrir chamado", onClick:()=> openTicketModal() });
+
+    addChips("bot", "Como você quer seguir?", chips);
+  }
+
+  async function expandTopic(topicId, cachedDetail){
+    addUser("Detalhar mais");
+
+    if(cachedDetail){
+      addCard("Detalhamento", cachedDetail);
+      addChips("bot","Mais alguma coisa?",[
+        {label:"Voltar ao guia", primary:true, onClick:()=> buildGuideMenu()},
+        {label:"Abrir chamado", onClick:()=> openTicketModal()},
+      ]);
+      return;
+    }
+
+    const { ok, data } = await postJSON(GUIDE_ENDPOINT, { action: "expand", topicId });
+
+    if(!ok){
+      addBot("Não consegui detalhar agora. Quer abrir um chamado?");
+      addChips("bot","Escolha:",[
+        {label:"Abrir chamado", primary:true, onClick:()=> openTicketModal()},
+        {label:"Voltar ao guia", onClick:()=> buildGuideMenu()}
+      ]);
+      return;
+    }
+
+    const detail = normalizeExpand(data);
+    if(detail) addCard("Detalhamento", detail);
+    else addBot("Não encontrei detalhamento para esse item.");
+
+    addChips("bot","Mais alguma coisa?",[
+      {label:"Voltar ao guia", primary:true, onClick:()=> buildGuideMenu()},
+      {label:"Abrir chamado", onClick:()=> openTicketModal()},
+    ]);
+  }
+
+  function resolvedFlow(){
+    addUser("Resolvido");
+    addBot("Perfeito! Se precisar de algo, é só chamar 🙂");
+    addChips("bot","Quer fazer mais alguma coisa?",[
+      {label:"Guia rápido", primary:true, onClick:()=> buildGuideMenu()},
+      {label:"Abrir chamado", onClick:()=> openTicketModal()},
+    ]);
+  }
+
+  function openTicketModal(){ modalWrap.classList.add("mbchat-show"); }
+  function closeTicketModal(){ modalWrap.classList.remove("mbchat-show"); ticketForm.reset(); }
+
+  closeModalBtn.onclick = closeTicketModal;
+  cancelTicketBtn.onclick = closeTicketModal;
+  modalWrap.addEventListener("click", (e)=>{ if(e.target === modalWrap) closeTicketModal(); });
+
+  ticketForm.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+
+    const fd = new FormData(ticketForm);
+    const payload = {
+      nomeCompleto: fd.get("nomeCompleto"),
+      email: fd.get("email"),
+      telefone: fd.get("telefone"),
+      tipoSolicitacao: fd.get("tipoSolicitacao"),
+      descricao: fd.get("descricao") || ""
+    };
+
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(payload));
+    const file = fd.get("evidencia");
+    if(file && file.name) formData.append("evidencia", file);
+
+    const res = await fetch(TICKET_ENDPOINT, { method:"POST", body: formData });
+    const data = await res.json().catch(()=> ({}));
+
+    closeTicketModal();
+    addUser("Abrir chamado");
+
+    if(res.ok){
+      const protocol = data.ticketId || data.protocolo || data.id || "gerado";
+      addBot(`Chamado registrado com sucesso ✅ Protocolo: ${protocol}`);
+    }else{
+      addBot("Não consegui registrar o chamado agora. Tenta novamente.");
+    }
+
+    addChips("bot","Quer mais alguma coisa?",[
+      {label:"Guia rápido", primary:true, onClick:()=> buildGuideMenu()},
+    ]);
+  });
+
+  async function searchFAQ(query){
+    const q = String(query || "").trim();
+    if(!q) return;
+
+    if(isSearching) return;
+    isSearching = true;
+    sendBtn.disabled = true;
+
+    addUser(q);
+
+    const { ok, data, status } = await postJSON(GUIDE_ENDPOINT, { action: "search", query: q });
+
+    if(!ok){
+      addBot(`Não consegui pesquisar agora. Status: ${status}`);
+      addChips("bot","Como você quer seguir?",[
+        {label:"Guia rápido", primary:true, onClick:()=> buildGuideMenu()},
+        {label:"Abrir chamado", onClick:()=> openTicketModal()}
+      ]);
+      isSearching = false;
+      sendBtn.disabled = false;
+      return;
+    }
+
+    const { options } = normalizeSearch(data);
+
+    if(!options.length){
+      addBot("Não entendi sua dúvida. Reescreva ou selecione uma das opções abaixo.");
+      addChips("bot","Escolha uma opção:",[
+        {label:"Guia rápido", primary:true, onClick:()=> buildGuideMenu()},
+        {label:"Abrir chamado", onClick:()=> openTicketModal()}
+      ]);
+      isSearching = false;
+      sendBtn.disabled = false;
+      return;
+    }
+
+    addBot("Encontrei estes tópicos relacionados 👇");
+    addChips("bot","Selecione uma opção:", options.map(o => ({
+      label: o.title,
+      onClick: () => answerTopic(o.topicId, o.title)
+    })));
+
+    isSearching = false;
+    sendBtn.disabled = false;
+  }
+
+  function handleSend(){
+    const text = (msgInput.value || "").trim();
+    if(!text) return;
+    msgInput.value = "";
+
+    if(text === "/guia"){ buildGuideMenu(); return; }
+    if(text === "/chamado"){ openTicketModal(); return; }
+
+    searchFAQ(text);
+  }
+
+  sendBtn.addEventListener("click", handleSend);
+  msgInput.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter"){
+      e.preventDefault();
+      handleSend();
+    }
+  });
+
+  // Open/close behavior
+  function openPanel(){
+    panel.classList.remove("mbchat-hidden");
+    start();
+    setTimeout(()=> msgInput.focus(), 50);
+  }
+  function closePanel(){
+    panel.classList.add("mbchat-hidden");
+  }
+
+  fab.addEventListener("click", ()=>{
+    const hidden = panel.classList.contains("mbchat-hidden");
+    if(hidden) openPanel(); else closePanel();
+  });
+  closeBtn.addEventListener("click", closePanel);
+
+  // optional: close on ESC
+  document.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape"){
+      if(!panel.classList.contains("mbchat-hidden")) closePanel();
+      if(modalWrap.classList.contains("mbchat-show")) closeTicketModal();
+    }
+  });
+
+})();
+});
+</script>
+
+</body>
+</html>
