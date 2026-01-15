@@ -96,14 +96,7 @@
         @media (min-width: 1024px) { .kanban-container { grid-template-columns: repeat(4, 1fr); overflow-y: hidden; } .kanban-column { height: 100%; max-width: none; } }
 
         .custom-scroll { -webkit-overflow-scrolling: touch; }
-    
-@supports (-webkit-touch-callout: none){
-  #mbchatPanel{
-    height:min(560px, calc(100vh - 160px));
-    max-height:calc(100vh - 160px);
-  }
-}
-</style>
+    </style>
 
 <!-- MoreBuzz Chat Widget styles -->
 <style>
@@ -117,8 +110,8 @@
   --mbchat-text:#0f172a;
   --mbchat-muted:#475569;
   --mbchat-shadow:0 18px 50px rgba(0,0,0,.18);
-  --mbchat-radius:10px;
-  --mbchat-radius2:14px;
+  --mbchat-radius:16px;
+  --mbchat-radius2:20px;
   --mbchat-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
 }
 
@@ -129,7 +122,7 @@
   bottom:20px;
   width:54px;
   height:54px;
-  border-radius:999px;
+  border-radius:10px;
   background:var(--mbchat-primary);
   border:2px solid rgba(255,255,255,.15);
   box-shadow:var(--mbchat-shadow);
@@ -146,10 +139,9 @@
 #mbchatPanel{
   position:fixed;
   right:20px;
-  bottom:calc(86px + env(safe-area-inset-bottom));
+  bottom:86px;
   width:min(380px, calc(100vw - 40px));
-  height:min(560px, calc(100dvh - 150px));
-  max-height:calc(100dvh - 150px);
+  height:min(560px, calc(100vh - 130px));
   background:var(--mbchat-surface);
   border:1px solid var(--mbchat-border);
   border-radius:var(--mbchat-radius2);
@@ -201,7 +193,6 @@
   padding:12px;
   flex:1;
   overflow:auto;
-  -webkit-overflow-scrolling:touch;
   background:linear-gradient(180deg, var(--mbchat-surface2), #ffffff);
 }
 
@@ -213,7 +204,7 @@
   max-width:min(290px, 82%);
   background:#f1f5f9;
   border:1px solid rgba(2,6,23,.08);
-  border-radius:6px;
+  border-radius:14px;
   padding:10px 11px;
   line-height:1.35;
   color:var(--mbchat-text);
@@ -233,12 +224,12 @@
   background:#fff;
   color:var(--mbchat-text);
   padding:8px 10px;
-  border-radius:6px;
+  border-radius:10px;
   cursor:pointer;
   user-select:none;
   transition:.15s ease;
   font-weight:700;
-  font-size:13px;
+  font-size:12.5px;
 }
 .mbchat-chip:hover{ transform:translateY(-1px); border-color:rgba(0,21,41,.35); }
 .mbchat-chip.primary{
@@ -249,7 +240,7 @@
 .mbchat-card{
   background:#fff;
   border:1px solid rgba(2,6,23,.10);
-  border-radius:6px;
+  border-radius:14px;
   padding:11px;
   margin-top:9px;
 }
@@ -272,7 +263,7 @@
   border:1px solid rgba(2,6,23,.12);
   background:#fff;
   color:var(--mbchat-text);
-  padding:10px 10px;
+  padding:0 12px;
   outline:none;
   font-family:var(--mbchat-font);
   font-size:13px;
@@ -282,7 +273,7 @@
   height:38px;
   border:none;
   border-radius:12px;
-  padding:10px 12px;
+  padding:0 14px;
   font-weight:900;
   cursor:pointer;
   color:#fff;
@@ -951,7 +942,7 @@
   <div id="mbchatChat" class="mbchat-chat"></div>
 
   <div class="mbchat-composer">
-    <input id="mbchatMsgInput" placeholder="Fale como posso ajudar" />
+    <input id="mbchatMsgInput" placeholder="Fale como podemos ajudar" />
     <button id="mbchatSendBtn">Enviar</button>
   </div>
 </div>
@@ -1081,16 +1072,8 @@ window.addEventListener('DOMContentLoaded', () => {
     return bubble;
   }
 
-  function addBot(text){
-  const safe = escapeHtml(text).replace(/
-/g,"<br>");
-  return addRow("bot", `<div>${safe}</div>`);
-}
-  function addUser(text){
-  const safe = escapeHtml(text).replace(/
-/g,"<br>");
-  return addRow("user", `<div>${safe}</div>`);
-}
+  function addBot(text){ return addRow("bot", `<div>${escapeHtml(text)}</div>`); }
+  function addUser(text){ return addRow("user", `<div>${escapeHtml(text)}</div>`); }
 
   function addChips(role, title, chips){
     const bubble = addRow(role, `
@@ -1193,8 +1176,7 @@ window.addEventListener('DOMContentLoaded', () => {
     started = true;
 
     // Mensagem inicial (conforme solicitado)
-    addBot("Olá! 👋
-Seja bem-vindo ao suporte da More Buzz.");
+    addBot("Olá! 👋\nSeja bem-vindo ao suporte da More Buzz.");
     addChips("bot", "Escolha uma opção:", [
       { label:"Guia rápido", primary:true, onClick: () => buildGuideMenu() },
       { label:"Abrir chamado", onClick: () => openTicketModal() },
@@ -1297,7 +1279,7 @@ Seja bem-vindo ao suporte da More Buzz.");
     if(canExpand){
       chips.push({ label:"Detalhar mais", primary:true, onClick:()=> expandTopic(topicId, detail) });
     }
-    chips.push({ label:"Finalizar atendimento", primary:true, onClick:()=> resolvedFlow() });
+    chips.push({ label:"Finalizar atendimento", onClick:()=> resolvedFlow() });
     chips.push({ label:"Abrir chamado", onClick:()=> openTicketModal() });
 
     addChips("bot", "Como você quer seguir?", chips);
@@ -1338,7 +1320,7 @@ Seja bem-vindo ao suporte da More Buzz.");
 
   function resolvedFlow(){
     addUser("Finalizar atendimento");
-    addBot("Perfeito! Se precisar de algo, é só chamar 🙂");
+    addBot("Perfeito! 😄\nSe precisar de algo, é só chamar");
     addChips("bot","Quer fazer mais alguma coisa?",[
       {label:"Guia rápido", primary:true, onClick:()=> buildGuideMenu()},
       {label:"Abrir chamado", onClick:()=> openTicketModal()},
@@ -1435,38 +1417,42 @@ Seja bem-vindo ao suporte da More Buzz.");
     sendBtn.disabled = false;
   }
 
-  function stripAccents(s){
-  return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-}
-function handleSend(){
-  const raw = (mbchatMsgInput.value || "").trim();
-  if(!raw) return;
-
-  mbchatMsgInput.value = "";
-
-  const t = stripAccents(raw).toLowerCase();
-
-  // atalhos digitados
-  if(t === "/guia" || t === "guia" || t.includes("guia rapido") || (t.includes("guia") && t.includes("rapido"))){
-    addUser(raw);
-    buildGuideMenu();
-    return;
-  }
-  if(t === "/chamado" || t.includes("abrir chamado") || t === "chamado" || t.includes("chamado")){
-    addUser(raw);
-    openTicketModal();
-    return;
-  }
-  if(t.includes("finalizar") || t.includes("encerrar") || t === "resolvido" || t.includes("resolver")){
-    addUser(raw);
-    resolvedFlow();
-    return;
+  function slugifyCommand(s){
+    return String(s||"")
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g,'')
+      .replace(/\s+/g,' ');
   }
 
-  // padrão: pesquisar na FAQ
-  searchFAQ(raw);
-}
-sendBtn.addEventListener("click", handleSend);
+  function handleSend(){
+    const raw = (msgInput.value || "").trim();
+    if(!raw) return;
+
+    msgInput.value = "";
+
+    const cmd = slugifyCommand(raw);
+
+    // comandos de texto (para quando o usuário digitar ao invés de clicar)
+    if(["/guia","guia","guia rapido","guia rápido","menu","temas"].includes(cmd)){
+      buildGuideMenu();
+      return;
+    }
+    if(["/chamado","chamado","abrir chamado","suporte","ticket"].includes(cmd)){
+      openTicketModal();
+      return;
+    }
+    if(["finalizar","encerrar","finalizar atendimento","resolvido","resolver"].includes(cmd)){
+      resolvedFlow();
+      return;
+    }
+
+    // padrão: pesquisar na FAQ
+    searchFAQ(raw);
+  }
+
+  sendBtn.addEventListener("click", handleSend);
   msgInput.addEventListener("keydown", (e)=>{
     if(e.key === "Enter"){
       e.preventDefault();
