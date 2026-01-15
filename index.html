@@ -96,7 +96,14 @@
         @media (min-width: 1024px) { .kanban-container { grid-template-columns: repeat(4, 1fr); overflow-y: hidden; } .kanban-column { height: 100%; max-width: none; } }
 
         .custom-scroll { -webkit-overflow-scrolling: touch; }
-    </style>
+    
+@supports (-webkit-touch-callout: none){
+  #mbchatPanel{
+    height:min(560px, calc(100vh - 160px));
+    max-height:calc(100vh - 160px);
+  }
+}
+</style>
 
 <!-- MoreBuzz Chat Widget styles -->
 <style>
@@ -110,8 +117,8 @@
   --mbchat-text:#0f172a;
   --mbchat-muted:#475569;
   --mbchat-shadow:0 18px 50px rgba(0,0,0,.18);
-  --mbchat-radius:16px;
-  --mbchat-radius2:20px;
+  --mbchat-radius:10px;
+  --mbchat-radius2:14px;
   --mbchat-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
 }
 
@@ -139,9 +146,10 @@
 #mbchatPanel{
   position:fixed;
   right:20px;
-  bottom:86px;
+  bottom:calc(86px + env(safe-area-inset-bottom));
   width:min(380px, calc(100vw - 40px));
-  height:min(560px, calc(100vh - 130px));
+  height:min(560px, calc(100dvh - 150px));
+  max-height:calc(100dvh - 150px);
   background:var(--mbchat-surface);
   border:1px solid var(--mbchat-border);
   border-radius:var(--mbchat-radius2);
@@ -193,6 +201,7 @@
   padding:12px;
   flex:1;
   overflow:auto;
+  -webkit-overflow-scrolling:touch;
   background:linear-gradient(180deg, var(--mbchat-surface2), #ffffff);
 }
 
@@ -204,7 +213,7 @@
   max-width:min(290px, 82%);
   background:#f1f5f9;
   border:1px solid rgba(2,6,23,.08);
-  border-radius:14px;
+  border-radius:6px;
   padding:10px 11px;
   line-height:1.35;
   color:var(--mbchat-text);
@@ -224,12 +233,12 @@
   background:#fff;
   color:var(--mbchat-text);
   padding:8px 10px;
-  border-radius:999px;
+  border-radius:6px;
   cursor:pointer;
   user-select:none;
   transition:.15s ease;
   font-weight:700;
-  font-size:12.5px;
+  font-size:13px;
 }
 .mbchat-chip:hover{ transform:translateY(-1px); border-color:rgba(0,21,41,.35); }
 .mbchat-chip.primary{
@@ -240,7 +249,7 @@
 .mbchat-card{
   background:#fff;
   border:1px solid rgba(2,6,23,.10);
-  border-radius:14px;
+  border-radius:6px;
   padding:11px;
   margin-top:9px;
 }
@@ -263,7 +272,7 @@
   border:1px solid rgba(2,6,23,.12);
   background:#fff;
   color:var(--mbchat-text);
-  padding:0 12px;
+  padding:10px 10px;
   outline:none;
   font-family:var(--mbchat-font);
   font-size:13px;
@@ -273,7 +282,7 @@
   height:38px;
   border:none;
   border-radius:12px;
-  padding:0 14px;
+  padding:10px 12px;
   font-weight:900;
   cursor:pointer;
   color:#fff;
@@ -930,7 +939,7 @@
   </svg>
 </button>
 
-<div id="mbchatPanel" class="mbchat-hidden" role="dialog" aria-label="Chat de suporte More Buzz">
+<div id="mbchatPanel" class="" role="dialog" aria-label="Chat de suporte More Buzz">
   <div class="mbchat-header">
     <div class="mbchat-brand">
       <div class="mbchat-logo">mb</div>
@@ -942,7 +951,7 @@
   <div id="mbchatChat" class="mbchat-chat"></div>
 
   <div class="mbchat-composer">
-    <input id="mbchatMsgInput" placeholder="Fale como podemos ajudar" />
+    <input id="mbchatMsgInput" placeholder="Fale como posso ajudar" />
     <button id="mbchatSendBtn">Enviar</button>
   </div>
 </div>
@@ -1072,8 +1081,16 @@ window.addEventListener('DOMContentLoaded', () => {
     return bubble;
   }
 
-  function addBot(text){ return addRow("bot", `<div>${escapeHtml(text)}</div>`); }
-  function addUser(text){ return addRow("user", `<div>${escapeHtml(text)}</div>`); }
+  function addBot(text){
+  const safe = escapeHtml(text).replace(/
+/g,"<br>");
+  return addRow("bot", `<div>${safe}</div>`);
+}
+  function addUser(text){
+  const safe = escapeHtml(text).replace(/
+/g,"<br>");
+  return addRow("user", `<div>${safe}</div>`);
+}
 
   function addChips(role, title, chips){
     const bubble = addRow(role, `
@@ -1175,7 +1192,9 @@ window.addEventListener('DOMContentLoaded', () => {
     if(started) return;
     started = true;
 
-    addBot("Olá! Seja bem-vindo ao suporte da More Buzz. Como você prefere seguir?");
+    // Mensagem inicial (conforme solicitado)
+    addBot("Olá! 👋
+Seja bem-vindo ao suporte da More Buzz.");
     addChips("bot", "Escolha uma opção:", [
       { label:"Guia rápido", primary:true, onClick: () => buildGuideMenu() },
       { label:"Abrir chamado", onClick: () => openTicketModal() },
@@ -1278,7 +1297,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if(canExpand){
       chips.push({ label:"Detalhar mais", primary:true, onClick:()=> expandTopic(topicId, detail) });
     }
-    chips.push({ label:"Resolvido", onClick:()=> resolvedFlow() });
+    chips.push({ label:"Finalizar atendimento", primary:true, onClick:()=> resolvedFlow() });
     chips.push({ label:"Abrir chamado", onClick:()=> openTicketModal() });
 
     addChips("bot", "Como você quer seguir?", chips);
@@ -1318,7 +1337,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function resolvedFlow(){
-    addUser("Resolvido");
+    addUser("Finalizar atendimento");
     addBot("Perfeito! Se precisar de algo, é só chamar 🙂");
     addChips("bot","Quer fazer mais alguma coisa?",[
       {label:"Guia rápido", primary:true, onClick:()=> buildGuideMenu()},
@@ -1326,8 +1345,10 @@ window.addEventListener('DOMContentLoaded', () => {
     ]);
   }
 
-  function openTicketModal(){ modalWrap.classList.add("mbchat-show"); }
-  function closeTicketModal(){ modalWrap.classList.remove("mbchat-show"); ticketForm.reset(); }
+  // Modal de abertura de chamado
+  // CSS do portal controla a exibição via classe `.open` (não alterar lógica do back)
+  function openTicketModal(){ modalWrap.classList.add("open"); }
+  function closeTicketModal(){ modalWrap.classList.remove("open"); ticketForm.reset(); }
 
   closeModalBtn.onclick = closeTicketModal;
   cancelTicketBtn.onclick = closeTicketModal;
@@ -1414,18 +1435,38 @@ window.addEventListener('DOMContentLoaded', () => {
     sendBtn.disabled = false;
   }
 
-  function handleSend(){
-    const text = (msgInput.value || "").trim();
-    if(!text) return;
-    msgInput.value = "";
+  function stripAccents(s){
+  return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+}
+function handleSend(){
+  const raw = (mbchatMsgInput.value || "").trim();
+  if(!raw) return;
 
-    if(text === "/guia"){ buildGuideMenu(); return; }
-    if(text === "/chamado"){ openTicketModal(); return; }
+  mbchatMsgInput.value = "";
 
-    searchFAQ(text);
+  const t = stripAccents(raw).toLowerCase();
+
+  // atalhos digitados
+  if(t === "/guia" || t === "guia" || t.includes("guia rapido") || (t.includes("guia") && t.includes("rapido"))){
+    addUser(raw);
+    buildGuideMenu();
+    return;
+  }
+  if(t === "/chamado" || t.includes("abrir chamado") || t === "chamado" || t.includes("chamado")){
+    addUser(raw);
+    openTicketModal();
+    return;
+  }
+  if(t.includes("finalizar") || t.includes("encerrar") || t === "resolvido" || t.includes("resolver")){
+    addUser(raw);
+    resolvedFlow();
+    return;
   }
 
-  sendBtn.addEventListener("click", handleSend);
+  // padrão: pesquisar na FAQ
+  searchFAQ(raw);
+}
+sendBtn.addEventListener("click", handleSend);
   msgInput.addEventListener("keydown", (e)=>{
     if(e.key === "Enter"){
       e.preventDefault();
@@ -1435,25 +1476,31 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Open/close behavior
   function openPanel(){
-    panel.classList.remove("mbchat-hidden");
-    start();
-    setTimeout(()=> msgInput.focus(), 50);
+    panel.classList.add("open");
+    // start only once
+    if(!window.__mbChatBooted){
+      window.__mbChatBooted = true;
+      start();
+    }
+    setTimeout(()=> msgInput && msgInput.focus(), 50);
   }
   function closePanel(){
-    panel.classList.add("mbchat-hidden");
+    panel.classList.remove("open");
   }
 
-  fab.addEventListener("click", ()=>{
-    const hidden = panel.classList.contains("mbchat-hidden");
-    if(hidden) openPanel(); else closePanel();
+  fab.addEventListener("click", (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    const isOpen = panel.classList.contains("open");
+    if(isOpen) closePanel(); else openPanel();
   });
-  closeBtn.addEventListener("click", closePanel);
+  closeBtn && closeBtn.addEventListener("click", (e)=>{ e.preventDefault(); closePanel(); });
 
   // optional: close on ESC
   document.addEventListener("keydown", (e)=>{
     if(e.key === "Escape"){
-      if(!panel.classList.contains("mbchat-hidden")) closePanel();
-      if(modalWrap.classList.contains("mbchat-show")) closeTicketModal();
+      if(panel.classList.contains("open")) closePanel();
+      if(modalWrap.classList.contains("open")) closeTicketModal();
     }
   });
 
